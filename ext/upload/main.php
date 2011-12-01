@@ -104,7 +104,12 @@ class Upload implements Extension {
 			}
 			else {
 				if(!$is_full) {
-					$this->theme->display_page($page);
+					if($this->can_upload($user)) {
+						$this->theme->display_page($page);
+					}
+					else {
+						$this->theme->display_permission_denied($page);
+					}
 				}
 			}
 		}
