@@ -68,7 +68,7 @@ class ImageAdminBlockBuildingEvent extends Event {
 
 class ViewImage extends SimpleExtension {
 	public function onPageRequest(PageRequestEvent $event) {
-		global $page, $user;
+		global $database, $page, $user;
 
 		if(
 			$event->page_matches("post/prev") ||
@@ -116,6 +116,13 @@ class ViewImage extends SimpleExtension {
 				$this->theme->display_admin_block($page, $iabbe->parts);
 			}
 			else {
+				$row = $database->get_row("SELECT id FROM images ORDER BY id DESC LIMIT 1");
+				if ($image_id < $row['id']) {
+					header("HTTP/1.0 410 Gone");
+				} else {
+					header("HTTP/1.0 404 Not Found");
+				}
+
 				$this->theme->display_error($page, "Image not found", "No image in the database has the ID #$image_id");
 			}
 		}
