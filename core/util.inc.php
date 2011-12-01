@@ -211,7 +211,7 @@ function make_link($page=null, $query=null) {
 function make_http($link) {
 	if(strpos($link, "ttp://") > 0) return $link;
 	if(strlen($link) > 0 && $link[0] != '/') $link = get_base_href().'/'.$link;
-	$link = "http://".$_SERVER["HTTP_HOST"].$link;
+	$link = "https://".$_SERVER["HTTP_HOST"].$link;
 	$link = str_replace("/./", "/", $link);
 	return $link;
 }

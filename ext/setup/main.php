@@ -216,7 +216,7 @@ class Setup extends SimpleExtension {
 			$themes[$human] = $name;
 		}
 
-		$full = "http://" . $_SERVER["SERVER_NAME"] . $_SERVER["PHP_SELF"];
+		$full = "https://" . $_SERVER["SERVER_NAME"] . $_SERVER["PHP_SELF"];
 		$test_url = str_replace("/index.php", "/nicetest", $full);
 
 		$nicescript = "<script language='javascript'>
