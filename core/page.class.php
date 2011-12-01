@@ -170,7 +170,7 @@ class Page {
 				$layout->display_page($page);
 				break;
 			case "data":
-				header("Content-Length: ".strlen($this->data));
+				// header("Content-Length: ".strlen($this->data));
 				if(!is_null($this->filename)) {
 					header('Content-Disposition: attachment; filename='.$this->filename);
 				}
