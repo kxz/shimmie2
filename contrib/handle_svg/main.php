@@ -41,7 +41,7 @@ class SVGFileHandler implements Extension {
 //			}
 //			else {
 				// FIXME: scale image, as not all boards use 192x192
-				copy("ext/handle_svg/thumb.jpg", warehouse_path("thumbs", $hash));
+				copy("ext/handle_svg/thumb.jpg", warehouse_path("thumbs", "$hash.jpg"));
 //			}
 		}
 

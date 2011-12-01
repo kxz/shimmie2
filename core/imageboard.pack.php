@@ -260,7 +260,7 @@ class Image {
 			return $this->parse_link_template($config->get_string('image_ilink'));
 		}
 		else if($config->get_bool('nice_urls', false)) {
-			return $this->parse_link_template(make_link('_images/$hash/$id - $tags.$ext'));
+			return $this->parse_link_template(make_link('_images/$hash.$ext'));
 		}
 		else {
 			return $this->parse_link_template(make_link('image/$id.$ext'));
@@ -289,7 +289,7 @@ class Image {
 			return $this->parse_link_template($config->get_string('image_tlink'));
 		}
 		else if($config->get_bool('nice_urls', false)) {
-			return $this->parse_link_template(make_link('_thumbs/$hash/thumb.jpg'));
+			return $this->parse_link_template(make_link('_thumbs/$hash.jpg'));
 		}
 		else {
 			return $this->parse_link_template(make_link('thumb/$id.jpg'));
@@ -957,7 +957,7 @@ class Tag {
  * heirachy, or throw an exception trying
  */
 function move_upload_to_archive($event) {
-	$target = warehouse_path("images", $event->hash);
+	$target = warehouse_path("images", $event->hash) . "." . $event->type;
 	if(!file_exists(dirname($target))) mkdir(dirname($target), 0755, true);
 	if(!@copy($event->tmpname, $target)) {
 		throw new UploadException("Failed to copy file from uploads ({$event->tmpname}) to archive ($target)");

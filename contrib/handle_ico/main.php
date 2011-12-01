@@ -88,11 +88,11 @@ class IcoFileHandler extends SimpleExtension {
 		return ($header['null'] == 0 && ($header['type'] == 0 || $header['type'] == 1));
 	}
 
-	private function create_thumb($hash) {
+	private function create_thumb($hash, $ext) {
 		global $config;
 
-		$inname  = warehouse_path("images", $hash);
-		$outname = warehouse_path("thumbs", $hash);
+		$inname  = warehouse_path("images", "$hash.$ext");
+		$outname = warehouse_path("thumbs", "$hash.jpg");
 
 		$w = $config->get_int("thumb_width");
 		$h = $config->get_int("thumb_height");

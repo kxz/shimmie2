@@ -135,7 +135,7 @@ abstract class DataHandlerExtension implements Extension {
 		if(($event instanceof DataUploadEvent) && $this->supported_ext($event->type) && $this->check_contents($event->tmpname)) {
 			if(!move_upload_to_archive($event)) return;
 			send_event(new ThumbnailGenerationEvent($event->hash, $event->type));
-			$image = $this->create_image_from_data(warehouse_path("images", $event->hash), $event->metadata);
+			$image = $this->create_image_from_data(warehouse_path("images", $event->hash) . "." . $event->type, $event->metadata);
 			if(is_null($image)) {
 				throw new UploadException("Data handler failed to create image object from data");
 			}
@@ -145,7 +145,7 @@ abstract class DataHandlerExtension implements Extension {
 		}
 
 		if(($event instanceof ThumbnailGenerationEvent) && $this->supported_ext($event->type)) {
-			$this->create_thumb($event->hash);
+			$this->create_thumb($event->hash, $event->type);
 		}
 
 		if(($event instanceof DisplayingImageEvent) && $this->supported_ext($event->image->ext)) {
@@ -157,6 +157,6 @@ abstract class DataHandlerExtension implements Extension {
 	abstract protected function supported_ext($ext);
 	abstract protected function check_contents($tmpname);
 	abstract protected function create_image_from_data($filename, $metadata);
-	abstract protected function create_thumb($hash);
+	abstract protected function create_thumb($hash, $ext);
 }
 ?>

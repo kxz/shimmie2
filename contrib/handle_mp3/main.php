@@ -6,9 +6,9 @@
  */
 
 class MP3FileHandler extends DataHandlerExtension {
-	protected function create_thumb($hash) {
+	protected function create_thumb($hash, $ext) {
 		// FIXME: scale image, as not all boards use 192x192
-		copy("ext/handle_mp3/thumb.jpg", warehouse_path("thumbs", $hash));
+		copy("ext/handle_mp3/thumb.jpg", warehouse_path("thumbs", "$hash.jpg"));
 	}
 
 	protected function supported_ext($ext) {
