@@ -313,7 +313,7 @@ class Image {
 	 * @retval string
 	 */
 	public function get_image_filename() {
-		return warehouse_path("images", $this->hash);
+		return warehouse_path("images", $this->hash . "." . $this->ext);
 	}
 
 	/**
@@ -322,7 +322,7 @@ class Image {
 	 * @retval string
 	 */
 	public function get_thumb_filename() {
-		return warehouse_path("thumbs", $this->hash);
+		return warehouse_path("thumbs", $this->hash . "." . $this->ext);
 	}
 
 	/**
