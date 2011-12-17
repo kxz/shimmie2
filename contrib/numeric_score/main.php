@@ -36,7 +36,7 @@ class NumericScore implements Extension {
 			if(!$user->is_anonymous()) {
 				$html = $this->theme->get_voter_html($event->image);
 				if($user->is_admin()) {
-					$html .= "<p><a href='/numeric_score_votes/{$event->image->id}'>See All Votes</a>";
+					$html .= "<p><a href='" . make_link("numeric_score_votes/{$event->image->id}") . "'>See All Votes</a>";
 				}
 				$page->add_block(new Block("Image Score", $html, "left", 20));
 			}
