@@ -79,7 +79,7 @@ class ViewImage extends SimpleExtension {
 
 			if(isset($_GET['search'])) {
 				$search_terms = explode(' ', $_GET['search']);
-				$query = "#search=".url_escape($_GET['search']);
+				$query = "search=".url_escape($_GET['search']);
 			}
 			else {
 				$search_terms = array();
@@ -99,6 +99,7 @@ class ViewImage extends SimpleExtension {
 				$page->set_redirect(make_link("post/view/{$image->id}", $query));
 			}
 			else {
+				header("HTTP/1.0 404 Not Found");
 				$this->theme->display_error($page, "Image not found", "No more images");
 			}
 		}
