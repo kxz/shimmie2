@@ -49,6 +49,11 @@ class Comment {
 		$this->posted =  $row['posted'];
 	}
 
+	public static function count_comments() {
+		global $database;
+		return $database->db->GetOne("SELECT COUNT(*) AS count FROM comments");
+	}
+
 	public static function count_comments_by_user($user) {
 		global $database;
 		return $database->db->GetOne("SELECT COUNT(*) AS count FROM comments WHERE owner_id=?", array($user->id));
