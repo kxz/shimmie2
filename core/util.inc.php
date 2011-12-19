@@ -2,6 +2,10 @@
 require_once "lib/recaptchalib.php";
 require_once "lib/securimage/securimage.php";
 
+if(!defined('DOKU_INC')) define('DOKU_INC','/var/www/omnipresence/public/wiki/');
+if(!defined('DOKU_REL')) define('DOKU_REL','/wiki/');
+require_once(DOKU_INC.'inc/init.php');
+
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *\
 * Input / Output Sanitising                                                 *
 \* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
@@ -890,20 +894,13 @@ function _get_page_request() {
 }
 
 function _get_user() {
-	global $config, $database;
-	$user = null;
-	if(get_prefixed_cookie("user") && get_prefixed_cookie("session")) {
-	    $tmp_user = User::by_session(get_prefixed_cookie("user"), get_prefixed_cookie("session"));
-		if(!is_null($tmp_user)) {
-			$user = $tmp_user;
-		}
-	}
-	if(is_null($user)) {
-		$user = User::by_id($config->get_int("anon_id", 0));
-	}
-	assert(!is_null($user));
+    global $auth, $config;
 
-	return $user;
+    if ($auth->_openDB() && $_SERVER["REMOTE_USER"]) {
+        return User::by_id((int)($auth->_getUserID($_SERVER["REMOTE_USER"])));
+    }
+
+    return User::by_id($config->get_int("anon_id", 0));
 }
 
 

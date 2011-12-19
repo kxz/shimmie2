@@ -1,4 +1,9 @@
 <?php
+
+if(!defined('DOKU_INC')) define('DOKU_INC','/var/www/omnipresence/public/wiki/');
+if(!defined('DOKU_REL')) define('DOKU_REL','/wiki/');
+require_once(DOKU_INC.'inc/init.php');
+
 /*
  * Name: User Management
  * Author: Shish
@@ -70,18 +75,12 @@ class UserPage extends SimpleExtension {
 
 		if($event->page_matches("user_admin")) {
 			if($event->get_arg(0) == "login") {
-				if(isset($_POST['user']) && isset($_POST['pass'])) {
-					$this->login($page);
-				}
-				else {
-					$this->theme->display_login_page($page);
-				}
+                $page->set_mode("redirect");
+                $page->set_redirect("https://room208.org/wiki/omnibooru_landing?do=login");
 			}
 			else if($event->get_arg(0) == "logout") {
-				set_prefixed_cookie("session", "", time()+60*60*24*$config->get_int('login_memory'), "/");
-				log_info("user", "Logged out");
-				$page->set_mode("redirect");
-				$page->set_redirect(make_link());
+                $page->set_mode("redirect");
+                $page->set_redirect("https://room208.org/wiki/omnibooru_landing?do=logout&sectok=" . getSecurityToken());
 			}
 			else if($event->get_arg(0) == "change_pass") {
 				$this->change_password_wrapper($page);
