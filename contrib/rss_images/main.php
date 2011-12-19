@@ -44,8 +44,8 @@ class RSS_Images extends SimpleExtension {
 			$link = make_http(make_link("post/view/{$image->id}"));
 			$tags = html_escape($image->get_tag_list());
 			$owner = $image->get_owner();
-			$thumb_url = $image->get_thumb_link();
-			$image_url = $image->get_image_link();
+			$thumb_url = make_http($image->get_thumb_link());
+			$image_url = make_http($image->get_image_link());
 			$posted = date(DATE_RSS, $image->posted_timestamp);
 			$content = html_escape(
 				"<p>" . Themelet::build_thumb_html($image) . "</p>" .
