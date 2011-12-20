@@ -775,7 +775,8 @@ class Image {
 				// MySQL is braindead, and does a full table scan on images, running the subquery once for each row -_-
 				// "{$this->get_images} WHERE images.id IN (SELECT image_id FROM tags WHERE tag LIKE ?) ",
 				"
-					SELECT images.*, UNIX_TIMESTAMP(posted) AS posted_timestamp
+                    SELECT DISTINCT images.*, UNIX_TIMESTAMP(posted) AS 
+                    posted_timestamp
 					FROM tags, image_tags, images
 					WHERE
 						tag LIKE ?
@@ -787,13 +788,13 @@ class Image {
 			if(strlen($img_search->sql) > 0) {
 				$query->append_sql(" AND ");
 				$query->append($img_search);
-			}
+            }
 		}
 
 		// more than one positive tag, or more than zero negative tags
 		else {
 			$subquery = new Querylet("
-				SELECT images.*, SUM({$tag_search->sql}) AS score
+                SELECT DISTINCT images.*, SUM({$tag_search->sql}) AS score
 				FROM images
 				LEFT JOIN image_tags ON image_tags.image_id = images.id
 				JOIN tags ON image_tags.tag_id = tags.id
