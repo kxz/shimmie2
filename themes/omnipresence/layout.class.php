@@ -188,6 +188,18 @@ class Layout {
 			$withleft = "noleft";
 		}
 
+		// attempt to get version number from git
+		$version = '';
+		$path = realpath(__DIR__ . "/../../.git");
+		if ($path !== FALSE) {
+			$output = array();
+			$retval = 1;
+			exec('git --git-dir=' . escapeshellarg($path) . ' describe', $output, $retval);
+			if ($retval === 0) {
+				$version = " " . html_escape($output[0]);
+			}
+		}
+
 		print <<<EOD
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN">
 <html>
@@ -219,7 +231,7 @@ $header_html
 		<div id="footer">
 			Images are the property of their respective owners.
 			$site_name is powered by <a href="http://code.shishnet.org/shimmie2/">Shimmie</a>
-			(<a href="https://bitbucket.org/kxz/shimmie2">Room 208 fork</a>).
+			(<a href="https://bitbucket.org/kxz/shimmie2">Room 208 fork</a>$version).
 			$contact
 		</div>
 	</body>
