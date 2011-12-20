@@ -88,7 +88,7 @@ class Layout {
 
 		$debug = get_debug_info();
 
-		$contact = empty($contact_link) ? "" : "<a href='$contact_link'>Contact the webmaster</a>";
+		$contact = empty($contact_link) ? "" : "<a href='$contact_link'>Contact the webmaster</a>.";
 
 		if(empty($this->subheading)) {
 			$subheading = "";
@@ -219,7 +219,7 @@ $header_html
 		<div id="footer">
 			Images are the property of their respective owners.
 			$site_name is powered by <a href="http://code.shishnet.org/shimmie2/">Shimmie</a>.
-			$contact.
+			$contact
 		</div>
 	</body>
 </html>
