@@ -2,10 +2,6 @@
 require_once "lib/recaptchalib.php";
 require_once "lib/securimage/securimage.php";
 
-if(!defined('DOKU_INC')) define('DOKU_INC','/var/www/omnipresence/public/wiki/');
-if(!defined('DOKU_REL')) define('DOKU_REL','/wiki/');
-require_once(DOKU_INC.'inc/init.php');
-
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *\
 * Input / Output Sanitising                                                 *
 \* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */

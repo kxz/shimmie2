@@ -66,6 +66,10 @@ if(empty($database_dsn) && !file_exists("config.php")) {
 }
 
 require_once "config.php";
+
+// DokuWiki authentication includes
+require_once(DOKU_INC.'inc/init.php');
+
 require_once "core/util.inc.php";
 require_once "lib/context.php";
 if(CONTEXT) {
