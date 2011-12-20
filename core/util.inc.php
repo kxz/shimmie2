@@ -204,6 +204,15 @@ function make_link($page=null, $query=null) {
 }
 
 /**
+ * Get the current protocol (HTTP or HTTPS), as best as we can figure
+ *
+ * @retval string
+ */
+function get_protocol() {
+	return (!empty($_SERVER["HTTPS"]) && $_SERVER["HTTPS"] !== "off") ? "https" : "http";
+}
+
+/**
  * Turn a relative link into an absolute one, including hostname
  *
  * @retval string
@@ -211,7 +220,7 @@ function make_link($page=null, $query=null) {
 function make_http($link) {
 	if(strpos($link, "ttp://") > 0) return $link;
 	if(strlen($link) > 0 && $link[0] != '/') $link = get_base_href().'/'.$link;
-	$link = "https://".$_SERVER["HTTP_HOST"].$link;
+    $link = get_protocol() . "://".$_SERVER["HTTP_HOST"].$link;
 	$link = str_replace("/./", "/", $link);
 	return $link;
 }
