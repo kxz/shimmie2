@@ -33,6 +33,15 @@ class RSS_Images extends SimpleExtension {
 	}
 
 
+	private function absolutize($content) {
+		return preg_replace_callback(
+			"#<(a.*? href|img.*? src)='(/.*?)'#",
+			function ($matches) {
+				return "<{$matches[1]}='" . make_http($matches[2]) . "'";
+			},
+			$content);
+	}
+
 	private function do_rss($images, $search_terms, $page_number) {
 		global $page;
 		global $config;
@@ -47,10 +56,10 @@ class RSS_Images extends SimpleExtension {
 			$thumb_url = make_http($image->get_thumb_link());
 			$image_url = make_http($image->get_image_link());
 			$posted = date(DATE_RSS, $image->posted_timestamp);
-			$content = html_escape(
+			$content = html_escape($this->absolutize(
 				"<p>" . Themelet::build_thumb_html($image) . "</p>" .
 				"<p>Uploaded by " . html_escape($owner->name) . "</p>"
-			);
+			));
 
 			$data .= "
 		<item>
