@@ -792,49 +792,25 @@ class Image {
 
 		// more than one positive tag, or more than zero negative tags
 		else {
-			$s_tag_array = array_map("sql_escape", $tag_search->variables);
-			$s_tag_list = join(', ', $s_tag_array);
-			
-			$tag_id_array = array();
-			$tags_ok = true;
-			foreach($tag_search->variables as $tag) {
-				$tag_ids = $database->db->GetCol("SELECT id FROM tags WHERE tag LIKE ?", array($tag));
-				$tag_id_array = array_merge($tag_id_array, $tag_ids);
-				$tags_ok = count($tag_ids) > 0;
-				if(!$tags_ok) break;
-			}
-			if($tags_ok) {
-				$tag_id_list = join(', ', $tag_id_array);
+			$subquery = new Querylet("
+				SELECT images.*, SUM({$tag_search->sql}) AS score
+				FROM images
+				LEFT JOIN image_tags ON image_tags.image_id = images.id
+				JOIN tags ON image_tags.tag_id = tags.id
+				GROUP BY images.id
+				HAVING score = ?",
+				array_merge(
+					$tag_search->variables,
+					array($positive_tag_count)
+				)
+			);
+			$query = new Querylet("
+				SELECT *, UNIX_TIMESTAMP(posted) AS posted_timestamp
+				FROM ({$subquery->sql}) AS images ", $subquery->variables);
 
-				$subquery = new Querylet("
-					SELECT images.*, SUM({$tag_search->sql}) AS score
-					FROM images
-					LEFT JOIN image_tags ON image_tags.image_id = images.id
-					JOIN tags ON image_tags.tag_id = tags.id
-					WHERE tags.id IN ({$tag_id_list})
-					GROUP BY images.id
-					HAVING score = ?",
-					array_merge(
-						$tag_search->variables,
-						array($positive_tag_count)
-					)
-				);
-				$query = new Querylet("
-					SELECT *, UNIX_TIMESTAMP(posted) AS posted_timestamp
-					FROM ({$subquery->sql}) AS images ", $subquery->variables);
-
-				if(strlen($img_search->sql) > 0) {
-					$query->append_sql(" WHERE ");
-					$query->append($img_search);
-				}
-			}
-			else {
-				# there are no results, "where 1=0" should shortcut things
-				$query = new Querylet("
-					SELECT images.*
-					FROM images
-					WHERE 1=0
-				");
+			if(strlen($img_search->sql) > 0) {
+				$query->append_sql(" WHERE ");
+				$query->append($img_search);
 			}
 		}
 
