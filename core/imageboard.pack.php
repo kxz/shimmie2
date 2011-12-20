@@ -322,8 +322,8 @@ class Image {
 	 * @retval string
 	 */
 	public function get_thumb_filename() {
-		return warehouse_path("thumbs", $this->hash . "." . $this->ext);
-	}
+        return warehouse_path("thumbs", $this->hash . ".jpg");
+    }
 
 	/**
 	 * Get the original filename
