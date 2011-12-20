@@ -218,7 +218,8 @@ $header_html
 
 		<div id="footer">
 			Images are the property of their respective owners.
-			$site_name is powered by <a href="http://code.shishnet.org/shimmie2/">Shimmie</a>.
+			$site_name is powered by <a href="http://code.shishnet.org/shimmie2/">Shimmie</a>
+			(<a href="https://bitbucket.org/kxz/shimmie2">Room 208 fork</a>).
 			$contact
 		</div>
 	</body>
