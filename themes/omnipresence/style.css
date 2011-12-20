@@ -290,3 +290,6 @@ html, body {
 margin:0;
 padding:0;
 }
+#main_image:hover {
+background:url(checker.png);
+}
