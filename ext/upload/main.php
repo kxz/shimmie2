@@ -163,7 +163,7 @@ class Upload implements Extension {
 			global $user;
 			$pathinfo = pathinfo($file['name']);
 			$metadata['filename'] = $pathinfo['basename'];
-			$metadata['extension'] = $pathinfo['extension'];
+			$metadata['extension'] = strtolower($pathinfo['extension']);
 			$metadata['tags'] = $tags;
 			$metadata['source'] = $source;
 			$event = new DataUploadEvent($user, $file['tmp_name'], $metadata);
@@ -247,7 +247,7 @@ class Upload implements Extension {
 			global $user;
 			$pathinfo = pathinfo($url);
 			$metadata['filename'] = $pathinfo['basename'];
-			$metadata['extension'] = $pathinfo['extension'];
+			$metadata['extension'] = strtolower($pathinfo['extension']);
 			$metadata['tags'] = $tags;
 			$metadata['source'] = $source;
 			$event = new DataUploadEvent($user, $tmp_filename, $metadata);
