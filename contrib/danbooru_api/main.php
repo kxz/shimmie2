@@ -77,8 +77,16 @@ class DanbooruApi implements Extension
 		global $config;
 		global $database;
 		global $user;
+
+		$fname_components = explode("?", $event->get_arg(2)); // this is very dumb to have to do
+		$fname_components = explode(".", $fname_components[0]); // e.g., "index.xml" or "create.json"
+		if ($fname_components[1] != 'xml' && $fname_components[1] != 'json') {
+			header('HTTP/1.0 404 Not Found');
+			return;
+		}
+
 		$page->set_mode("data");
-		$page->set_type("application/xml");
+		$page->set_type("application/" . $fname_components[1]);
 		//debug
 		//$page->set_type("text/plain");
 
@@ -110,9 +118,9 @@ class DanbooruApi implements Extension
 		Get
 		* Redirected to the newly uploaded post.
 		*/
-		if(($event->get_arg(1) == 'add_post') || (($event->get_arg(1) == 'post') && ($event->get_arg(2) == 'create.xml')))
+		if(($event->get_arg(1) == 'add_post') || (($event->get_arg(1) == 'post') && ($fname_components[0] == 'create')))
 		{
-			// No XML data is returned from this function
+			// No XML/JSON data is returned from this function
 			$page->set_type("text/plain");
 			// Check first if a login was supplied, if it wasn't check if the user is logged in via cookie
 			// If all that fails, it's an anonymous upload
@@ -276,7 +284,7 @@ class DanbooruApi implements Extension
 		* offset: offset
 		* after_id: limit results to posts added after this id
 		*/
-		if(($event->get_arg(1) == 'find_posts') || (($event->get_arg(1) == 'post') && ($event->get_arg(2) == 'index.xml')))
+		if(($event->get_arg(1) == 'find_posts') || (($event->get_arg(1) == 'post') && ($fname_components[0] == 'index')))
 		{
 			$this->authenticate_user();
 			if(isset($_GET['md5']))
@@ -303,7 +311,10 @@ class DanbooruApi implements Extension
 
 			// Now we have the array $results filled with Image objects
 			// Let's display them
-			$xml = "<posts>\n";
+			if ($fname_components[1] == 'xml')
+				$page_data = "<posts>\n";
+			else
+				$page_data = "[";
 			foreach($results as $img)
 			{
 				// Sanity check to see if $img is really an image object
@@ -312,10 +323,23 @@ class DanbooruApi implements Extension
 					continue;
 				$taglist = $img->get_tag_list();
 				$owner = $img->get_owner();
-				$xml .= "<post md5=\"$img->hash\" rating=\"Questionable\" date=\"$img->posted\" is_warehoused=\"false\" file_name=\"$img->filename\" tags=\"" . $this->xmlspecialchars($taglist) . "\" source=\"" . $this->xmlspecialchars($img->source) . "\" score=\"0\" id=\"$img->id\" author=\"$owner->name\"/>\n";
+				if ($fname_components[1] == 'xml')
+					$page_data .= "<post md5=\"$img->hash\" rating=\"Questionable\" date=\"$img->posted\" is_warehoused=\"false\" file_name=\"$img->filename\" tags=\"" . $this->xmlspecialchars($taglist) . "\" source=\"" . $this->xmlspecialchars($img->source) . "\" score=\"0\" id=\"$img->id\" author=\"$owner->name\" file_url=\"" . make_http($img->get_image_link()) . "\"/>\n";
+				else {
+			 		$page_data .= "{\"md5\":\"$img->hash\",\"rating\":\"Questionable\",";
+					$page_data .= "\"date\":\"$img->posted\",\"is_warehoused\":false,";
+					$page_data .= "\"file_name\":\"$img->filename\",";
+					$page_data .= "\"tags\":\"" . $this->xmlspecialchars($taglist) . "\" ,";
+					$page_data .= "\"source\":\"" . $this->xmlspecialchars($img->source) . "\" ,";
+					$page_data .= "\"score\":0,\"id\":$img->id,\"author\":\"$owner->name\",";
+					$page_data .= "\"file_url\":\"" . make_http($img->get_image_link()) . "\"}";
+				}
 			}
-			$xml .= "</posts>";
-			$page->set_data($xml);
+			if ($fname_components[1] == 'xml')
+			   $page_data .= "</posts>"; 
+			else
+			   $page_data .= "]";
+			$page->set_data($page_data);
 		}
 
 		/*
@@ -370,14 +394,23 @@ class DanbooruApi implements Extension
 				}
 			}
 
-			// Tag results collected, build XML output
-			$xml = "<tags>\n";
-			foreach($results as $tag)
-			{
-				$xml .= "<tag type=\"0\" count=\"$tag[0]\" name=\"" . $this->xmlspecialchars($tag[1]) . "\" id=\"$tag[2]\"/>\n";
+			// Tag results collected, build output
+			if ($fname_components[1] == 'xml') { // I just noticed that putting the json stuff in else is bad
+			   $page_data = "<tags>\n";
+			   foreach($results as $tag)
+			   {
+					$page_data .= "<tag type=\"0\" count=\"$tag[0]\" name=\"" . $this->xmlspecialchars($tag[1]) . "\" id=\"$tag[2]\"/>\n";
+			   }
+			   $page_data .= "</tags>";
+			} else {
+			   $page_data = "[";
+			   foreach($results as $tag)
+			   {
+					$page_data .= "{\"type\":0,\"count\":\"$tag[0]\",\"name\":\"" . $this.xmlspecialchars($tag[1]) . "\" \"id\":$tag[2]\"}";
+		           }
+			   $page_data .= "]";
 			}
-			$xml .= "</tags>";
-			$page->set_data($xml);
+			$page->set_data($page_data);
 		}
 
 		// Hackery for danbooruup 0.3.2 providing the wrong view url. This simply redirects to the proper
