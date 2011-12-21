@@ -315,7 +315,7 @@ class DanbooruApi implements Extension
 				$page_data = "<posts>\n";
 			else
 				$page_data = "[";
-			foreach($results as $img)
+			foreach($results as $key => $img)
 			{
 				// Sanity check to see if $img is really an image object
 				// If it isn't (e.g. someone requested an invalid md5 or id), break out of the this
@@ -326,6 +326,8 @@ class DanbooruApi implements Extension
 				if ($fname_components[1] == 'xml')
 					$page_data .= "<post md5=\"$img->hash\" rating=\"Questionable\" date=\"$img->posted\" is_warehoused=\"false\" file_name=\"$img->filename\" tags=\"" . $this->xmlspecialchars($taglist) . "\" source=\"" . $this->xmlspecialchars($img->source) . "\" score=\"0\" id=\"$img->id\" author=\"$owner->name\" file_url=\"" . make_http($img->get_image_link()) . "\"/>\n";
 				else {
+					if ($key > 0) 
+						$page_data .= ",";
 			 		$page_data .= "{\"md5\":\"$img->hash\",\"rating\":\"Questionable\",";
 					$page_data .= "\"date\":\"$img->posted\",\"is_warehoused\":false,";
 					$page_data .= "\"file_name\":\"$img->filename\",";
