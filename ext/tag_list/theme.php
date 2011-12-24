@@ -42,10 +42,10 @@ class TagListTheme extends Themelet {
 			$h_tag_no_underscores = str_replace("_", " ", $h_tag);
 			$count = $row['calc_count'];
 			if($n++) $html .= "\n<br/>";
-			if(!is_null($config->get_string('info_link'))) {
-				$link = html_escape(str_replace('$tag', $tag, $config->get_string('info_link')));
-				$html .= " <a class='tag_info_link' href='$link'>?</a>";
-			}
+			$tag_page = $tag;
+			resolve_pageid("shimmie", $tag_page, $exists);
+			$link = html_escape(wl($tag_page));
+			$html .= " <a class='tag_info_link" . ($exists ? '' : ' new') . "' href='$link'>?</a>";
 			$link = $this->tag_link($row['tag']);
 			$html .= " <a class='tag_name' href='$link'>$h_tag_no_underscores</a>";
 			if($config->get_bool("tag_list_numbers")) {
@@ -74,10 +74,10 @@ class TagListTheme extends Themelet {
 			$h_tag_no_underscores = str_replace("_", " ", $h_tag);
 			$count = $row['count'];
 			if($n++) $html .= "\n<br/>";
-			if(!is_null($config->get_string('info_link'))) {
-				$link = html_escape(str_replace('$tag', $tag, $config->get_string('info_link')));
-				$html .= " <a class='tag_info_link' href='$link'>?</a>";
-			}
+			$tag_page = $tag;
+			resolve_pageid("shimmie", $tag_page, $exists);
+			$link = html_escape(wl($tag_page));
+			$html .= " <a class='tag_info_link" . ($exists ? '' : ' new') . "' href='$link'>?</a>";
 			$link = $this->tag_link($row['tag']);
 			$html .= " <a class='tag_name' href='$link'>$h_tag_no_underscores</a>";
 			if($config->get_bool("tag_list_numbers")) {
@@ -106,10 +106,10 @@ class TagListTheme extends Themelet {
 			$h_tag = html_escape($tag);
 			$h_tag_no_underscores = str_replace("_", " ", $h_tag);
 			if($n++) $html .= "\n<br/>";
-			if(!is_null($config->get_string('info_link'))) {
-				$link = html_escape(str_replace('$tag', $tag, $config->get_string('info_link')));
-				$html .= " <a class='tag_info_link' href='$link'>?</a>";
-			}
+			$tag_page = $tag;
+			resolve_pageid("shimmie", $tag_page, $exists);
+			$link = html_escape(wl($tag_page));
+			$html .= " <a class='tag_info_link" . ($exists ? '' : ' new') . "' href='$link'>?</a>";
 			$link = $this->tag_link($row['tag']);
 			$html .= " <a class='tag_name' href='$link'>$h_tag_no_underscores</a>";
 			$html .= $this->ars($tag, $search);
