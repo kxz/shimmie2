@@ -54,7 +54,7 @@ class UploadTheme extends Themelet {
 			<ul>
 			<li>Don't upload non-free music. It tends to get webmasters sued.</li>
 			<li>Properly tag images, using existing tags if possible. Leaving \"tagme\" is an invitation for your image to be deleted.</li>
-			<li>Include a source URL that is as close to the original source as possible. <a href='http://iqdb.org/'>IQDB</a> is useful for image matching on other imageboards. If possible, link to the artist's page, rather than another imageboard.</li>
+			<li>Include a source URL that is as close to the original source as possible. <strong>If you're uploading from an imageboard, enter the source URL provided on the image's page, not just the imageboard's image URL.</strong> You can use <a href='http://iqdb.org/'>IQDB</a> to find matching images on well-known imageboards, if you're having trouble finding an image's origin.</li>
 			</ul>
 			<p><strong>Note that images without lasting value are subject to deletion after 14 days.</strong> This is a subjective criterion, but generally excludes original works by the uploader, heavily favorited images, or images participating in a useful pool.</p>
 			<p>This imageboard accepts uploads in GIF, JPEG, and PNG formats for images, and MP3 format for audio.</p>
