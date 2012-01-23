@@ -14,19 +14,21 @@ class CustomIndexTheme extends IndexTheme {
 			$page_title = html_escape($search_string);
 			if(count($this->search_terms) == 1) {
 				$tag_id = $database->db->GetCol("SELECT id FROM tags WHERE tag = ?", $this->search_terms);
-				$tag_id = $tag_id[0];
-				resolve_pageid("shimmie", $tag_id, $exists);
-				// wl() already does HTML escaping, so we don't need it here
-				$edit_link = wl($tag_id, 'do=edit');
-				
-				if($exists) {
-					$content = p_wiki_xhtml($tag_id) . "<p><a href=\"$edit_link\">Edit this description</a></p>";
-				} else {
-					$content = "<p>No description exists for the tag \"$page_title\". " .
-					           "<a href=\"$edit_link\">Create one</a></p>";
+				if(count($tag_id) == 1) {
+					$tag_id = $tag_id[0];
+					resolve_pageid("shimmie", $tag_id, $exists);
+					// wl() already does HTML escaping, so we don't need it here
+					$edit_link = wl($tag_id, 'do=edit');
+					
+					if($exists) {
+						$content = p_wiki_xhtml($tag_id) . "<p><a href=\"$edit_link\">Edit this description</a></p>";
+					} else {
+						$content = "<p>No description exists for the tag \"$page_title\". " .
+								   "<a href=\"$edit_link\">Create one</a></p>";
+					}
+					
+					$page->add_block(new Block("Wiki", $content, "main", 0));
 				}
-				
-				$page->add_block(new Block("Wiki", $content, "main", 0));
 			}
 		}
 
