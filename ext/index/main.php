@@ -169,10 +169,6 @@ class Index extends SimpleExtension {
 				$this->theme->display_intro($page);
 				send_event(new PostListBuildingEvent($search_terms));
 			}
-			else if(count($search_terms) > 0 && count($images) == 1 && $page_number == 1) {
-				$page->set_mode("redirect");
-				$page->set_redirect(make_link("post/view/{$images[0]->id}"));
-			}
 			else {
 				send_event(new PostListBuildingEvent($search_terms));
 

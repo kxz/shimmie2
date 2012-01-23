@@ -78,7 +78,7 @@ class Layout {
 					if($block->header == "Images") {
 						$block->header = "&nbsp;";
 					}
-					$main_block_html .= $this->block_to_html($block, false);
+					$main_block_html .= $this->block_to_html($block, $block->header == "Wiki");
 					break;
 				default:
 					print "<p>error: {$block->header} using an unknown section ({$block->section})";

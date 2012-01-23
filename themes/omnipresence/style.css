@@ -293,6 +293,6 @@ padding:0;
 #main_image:hover {
 background:url(checker.png);
 }
-.tag_info_link.new {
+.tag_name.new {
 color: darkred;
 }

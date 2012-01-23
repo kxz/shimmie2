@@ -25,13 +25,13 @@ class TagListTheme extends Themelet {
 
 	// =======================================================================
 	
-	protected function tag_info_link($tag) {
-		global $config;
+	protected function has_wiki($tag) {
+		global $database;
 		
-		$tag_page = str_replace(array(':', '/'), '_', $tag);
-		resolve_pageid("shimmie", $tag_page, $exists);
-		$link = html_escape(wl($tag_page));
-		return " <a class='tag_info_link" . ($exists ? '' : ' new') . "' href='$link'>?</a>";
+        $tag_id = $database->db->GetCol("SELECT id FROM tags WHERE tag = ?", array($tag));
+		$tag_id = $tag_id[0];
+		resolve_pageid("shimmie", $tag_id, $exists);
+		return $exists;
 	}
 
 	/*
@@ -51,9 +51,8 @@ class TagListTheme extends Themelet {
 			$h_tag_no_underscores = str_replace("_", " ", $h_tag);
 			$count = $row['calc_count'];
 			if($n++) $html .= "\n<br/>";
-			$html .= $this->tag_info_link($tag);
 			$link = $this->tag_link($row['tag']);
-			$html .= " <a class='tag_name' href='$link'>$h_tag_no_underscores</a>";
+			$html .= " <a class='tag_name" . ($this->has_wiki($tag) ? '' : ' new') . "' href='$link'>$h_tag_no_underscores</a>";
 			if($config->get_bool("tag_list_numbers")) {
 				$html .= " <span class='tag_count'>$count</span>";
 			}
@@ -80,9 +79,8 @@ class TagListTheme extends Themelet {
 			$h_tag_no_underscores = str_replace("_", " ", $h_tag);
 			$count = $row['count'];
 			if($n++) $html .= "\n<br/>";
-			$html .= $this->tag_info_link($tag);
 			$link = $this->tag_link($row['tag']);
-			$html .= " <a class='tag_name' href='$link'>$h_tag_no_underscores</a>";
+			$html .= " <a class='tag_name" . ($this->has_wiki($tag) ? '' : ' new') . "' href='$link'>$h_tag_no_underscores</a>";
 			if($config->get_bool("tag_list_numbers")) {
 				$html .= " <span class='tag_count'>$count</span>";
 			}
@@ -109,9 +107,8 @@ class TagListTheme extends Themelet {
 			$h_tag = html_escape($tag);
 			$h_tag_no_underscores = str_replace("_", " ", $h_tag);
 			if($n++) $html .= "\n<br/>";
-			$html .= $this->tag_info_link($tag);
 			$link = $this->tag_link($row['tag']);
-			$html .= " <a class='tag_name' href='$link'>$h_tag_no_underscores</a>";
+			$html .= " <a class='tag_name" . ($this->has_wiki($tag) ? '' : ' new') . "' href='$link'>$h_tag_no_underscores</a>";
 			$html .= $this->ars($tag, $search);
 		}
 
