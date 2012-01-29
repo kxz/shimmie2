@@ -80,13 +80,15 @@ class DanbooruApi implements Extension
 
 		$fname_components = explode("?", $event->get_arg(2)); // this is very dumb to have to do
 		$fname_components = explode(".", $fname_components[0]); // e.g., "index.xml" or "create.json"
-		if ($fname_components[1] != 'xml' && $fname_components[1] != 'json') {
+		if ($fname_components[1] == 'xml' || $fname_components[1] == 'json') {
+			$type = $fname_components[1];
+		} else {
 			header('HTTP/1.0 404 Not Found');
 			return;
 		}
 
 		$page->set_mode("data");
-		$page->set_type("application/" . $fname_components[1]);
+		$page->set_type("application/" . $type);
 		//debug
 		//$page->set_type("text/plain");
 
@@ -311,37 +313,62 @@ class DanbooruApi implements Extension
 
 			// Now we have the array $results filled with Image objects
 			// Let's display them
-			if ($fname_components[1] == 'xml')
-				$page_data = "<posts>\n";
-			else
-				$page_data = "[";
-			foreach($results as $key => $img)
-			{
-				// Sanity check to see if $img is really an image object
-				// If it isn't (e.g. someone requested an invalid md5 or id), break out of the this
-				if(!is_object($img))
-					continue;
-				$taglist = $img->get_tag_list();
-				$owner = $img->get_owner();
-				if ($fname_components[1] == 'xml')
-					$page_data .= "<post md5=\"$img->hash\" rating=\"Questionable\" date=\"$img->posted\" is_warehoused=\"false\" file_name=\"$img->filename\" tags=\"" . $this->xmlspecialchars($taglist) . "\" source=\"" . $this->xmlspecialchars($img->source) . "\" score=\"0\" id=\"$img->id\" author=\"$owner->name\" file_url=\"" . make_http($img->get_image_link()) . "\"/>\n";
-				else {
-					if ($key > 0) 
-						$page_data .= ",";
-			 		$page_data .= "{\"md5\":\"$img->hash\",\"rating\":\"Questionable\",";
-					$page_data .= "\"date\":\"$img->posted\",\"is_warehoused\":false,";
-					$page_data .= "\"file_name\":\"$img->filename\",";
-					$page_data .= "\"tags\":\"" . $this->xmlspecialchars($taglist) . "\" ,";
-					$page_data .= "\"source\":\"" . $this->xmlspecialchars($img->source) . "\" ,";
-					$page_data .= "\"score\":0,\"id\":$img->id,\"author\":\"$owner->name\",";
-					$page_data .= "\"file_url\":\"" . make_http($img->get_image_link()) . "\"}";
-				}
+			switch ($type) {
+				case 'json':
+					$posts = array();
+					
+					foreach($results as $key => $img) {
+						// Sanity check to see if $img is really an image object
+						// If it isn't (e.g. someone requested an invalid md5 or id), break out of the this
+						if(!is_object($img))
+							continue;
+						
+						$posts[] = array(
+							'md5' => $img->hash,
+							'rating' => 'Questionable',
+							'date' => $img->posted,
+							'is_warehoused' => 'false',
+							'file_name' => $img->filename,
+							'tags' => $taglist,
+							'source' => $img->source,
+							'score' => 0,
+							'id' => $img->id,
+							'author' => $owner->name,
+							'file_url' => make_http($img->get_image_link())
+						);
+					}
+					
+					$page->set_data(json_encode($posts));
+				break;
+				
+				case 'xml':
+				default:
+					$posts = new SimpleXMLElement('<posts></posts>');
+					
+					foreach($results as $key => $img)
+					{
+						// Sanity check to see if $img is really an image object
+						// If it isn't (e.g. someone requested an invalid md5 or id), break out of the this
+						if(!is_object($img))
+							continue;
+						
+						$post = $posts->addChild('post');
+						$post->addAttribute('md5', $img->hash);
+						$post->addAttribute('rating', 'Questionable');
+						$post->addAttribute('date', $img->posted);
+						$post->addAttribute('is_warehoused', 'false');
+						$post->addAttribute('file_name', $img->filename);
+						$post->addAttribute('tags', $taglist);
+						$post->addAttribute('source', $img->source);
+						$post->addAttribute('score', 0);
+						$post->addAttribute('id', $img->id);
+						$post->addAttribute('author', $owner->name);
+						$post->addAttribute('file_url', make_http($img->get_image_link()));
+					}
+					
+					$page->set_data($posts->asXML());
+				break;
 			}
-			if ($fname_components[1] == 'xml')
-			   $page_data .= "</posts>"; 
-			else
-			   $page_data .= "]";
-			$page->set_data($page_data);
 		}
 
 		/*
@@ -397,22 +424,38 @@ class DanbooruApi implements Extension
 			}
 
 			// Tag results collected, build output
-			if ($fname_components[1] == 'xml') { // I just noticed that putting the json stuff in else is bad
-			   $page_data = "<tags>\n";
-			   foreach($results as $tag)
-			   {
-					$page_data .= "<tag type=\"0\" count=\"$tag[0]\" name=\"" . $this->xmlspecialchars($tag[1]) . "\" id=\"$tag[2]\"/>\n";
-			   }
-			   $page_data .= "</tags>";
-			} else {
-			   $page_data = "[";
-			   foreach($results as $tag)
-			   {
-					$page_data .= "{\"type\":0,\"count\":\"$tag[0]\",\"name\":\"" . $this.xmlspecialchars($tag[1]) . "\" \"id\":$tag[2]\"}";
-		           }
-			   $page_data .= "]";
+			switch ($type) {
+				case 'json':
+					$tags = array();
+					
+					foreach($results as $tag) {
+						$tags[] = array(
+							'type' => 0,
+							'count' => $tag[0],
+							'name' => $tag[1],
+							'id' => $tag[2]
+						);
+					}
+					
+					$page->set_data(json_encode($tags));
+				break;
+				
+				case 'xml':
+				default:
+					$tags = new SimpleXMLElement('<tags></tags>');
+					
+					foreach($results as $tag)
+					{
+						$xtag = $tags->addChild('tag');
+						$xtag->addAttribute('type', 0);
+						$xtag->addAttribute('count', $tag[0]);
+						$xtag->addAttribute('name', $tag[1]);
+						$xtag->addAttribute('id', $tag[2]);
+					}
+					
+					$page->set_data($tags->asXML());
+				break;
 			}
-			$page->set_data($page_data);
 		}
 
 		// Hackery for danbooruup 0.3.2 providing the wrong view url. This simply redirects to the proper
@@ -450,13 +493,6 @@ class DanbooruApi implements Extension
 				$user = User::by_id($config->get_int("anon_id", 0));
 			}
 		}
-	}
-
-	// From htmlspecialchars man page on php.net comments
-	// If tags contain quotes they need to be htmlified
-	private function xmlspecialchars($text)
-	{
-		return str_replace('&#039;', '&apos;', htmlspecialchars($text, ENT_QUOTES));
 	}
 }
 
