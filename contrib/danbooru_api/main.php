@@ -329,11 +329,11 @@ class DanbooruApi implements Extension
 							'date' => $img->posted,
 							'is_warehoused' => 'false',
 							'file_name' => $img->filename,
-							'tags' => $taglist,
-							'source' => $img->source,
+							'tags' => $img->get_tag_list(),
+							'source' => ($img->source ? $img->source : ''),
 							'score' => 0,
-							'id' => $img->id,
-							'author' => $owner->name,
+							'id' => intval($img->id),
+							'author' => $img->get_owner()->name,
 							'file_url' => make_http($img->get_image_link())
 						);
 					}
@@ -358,11 +358,11 @@ class DanbooruApi implements Extension
 						$post->addAttribute('date', $img->posted);
 						$post->addAttribute('is_warehoused', 'false');
 						$post->addAttribute('file_name', $img->filename);
-						$post->addAttribute('tags', $taglist);
-						$post->addAttribute('source', $img->source);
+						$post->addAttribute('tags', $img->get_tag_list());
+						$post->addAttribute('source', ($img->source ? $img->source : ''));
 						$post->addAttribute('score', 0);
 						$post->addAttribute('id', $img->id);
-						$post->addAttribute('author', $owner->name);
+						$post->addAttribute('author', $img->get_owner()->name);
 						$post->addAttribute('file_url', make_http($img->get_image_link()));
 					}
 					
@@ -431,9 +431,9 @@ class DanbooruApi implements Extension
 					foreach($results as $tag) {
 						$tags[] = array(
 							'type' => 0,
-							'count' => $tag[0],
+							'count' => intval($tag[0]),
 							'name' => $tag[1],
-							'id' => $tag[2]
+							'id' => intval($tag[2])
 						);
 					}
 					
