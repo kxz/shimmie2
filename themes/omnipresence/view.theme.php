@@ -32,10 +32,11 @@ class CustomViewImageTheme extends ViewImageTheme {
 
 		if(!is_null($image->source)) {
 			$h_source = html_escape($image->source);
-			if(substr($image->source, 0, 7) != "http://") {
-				$h_source = "http://" . $h_source;
+			if(preg_match('#^(ftp|https?)://#', $image->source)) {
+				$html .= "<br>Source: <a href='$h_source'>link</a>";
+			} else {
+				$html .= "<br>Source: $h_source";
 			}
-			$html .= "<br>Source: <a href='$h_source'>link</a>";
 		}
 
 		return $html;
