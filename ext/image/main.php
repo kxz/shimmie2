@@ -206,11 +206,6 @@ class ImageIO extends SimpleExtension {
 		if(strlen(trim($image->source)) == 0) {
 			$image->source = null;
 		}
-		if(!empty($image->source)) {
-			if(!preg_match("#^(https?|ftp)://#", $image->source)) {
-				throw new ImageAdditionException("Image's source isn't a valid URL");
-			}
-		}
 
 		/*
 		 * Check for an existing image
