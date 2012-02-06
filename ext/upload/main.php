@@ -54,6 +54,7 @@ class Upload implements Extension {
 			$config->set_default_int('upload_count', 3);
 			$config->set_default_int('upload_size', '1MB');
 			$config->set_default_bool('upload_anon', false);
+			$config->set_default_string('upload_message', '');
 		}
 
 		if($event instanceof PostListBuildingEvent) {
@@ -129,6 +130,7 @@ class Upload implements Extension {
 			$sb->add_shorthand_int_option("upload_size", "<br>Max size per file: ");
 			$sb->add_bool_option("upload_anon", "<br>Allow anonymous uploads: ");
 			$sb->add_choice_option("transload_engine", $tes, "<br>Transload: ");
+			$sb->add_longtext_option("upload_message", "<br>Upload page message:<br>");
 			$event->panel->add_block($sb);
 		}
 
