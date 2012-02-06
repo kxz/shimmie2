@@ -36,7 +36,7 @@ padding:10px 20px 0;
 body {
 -x-system-font:none;
 background-color:#FFFFFF;
-font-family:verdana,sans-serif;
+font-family:lucida grande,verdana,sans-serif;
 font-size:80%;
 font-size-adjust:none;
 font-stretch:normal;
@@ -240,9 +240,6 @@ text-align:left;
 }
 div#header h1 {
 text-align:left;
-}
-* {
-font-family:verdana,sans-serif;
 }
 a:link, a:visited {
 color:darkorange;
