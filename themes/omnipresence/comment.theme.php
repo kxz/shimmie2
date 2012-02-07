@@ -115,5 +115,29 @@ class CustomCommentListTheme extends CommentListTheme {
 			";
 		}
 	}
+
+	protected function build_postbox($image_id) {
+		global $config, $user;
+
+		$i_image_id = int_escape($image_id);
+		$hash = CommentList::get_hash();
+		$captcha = $config->get_bool("comment_captcha") ? captcha_get_html() : "";
+		$current_user = ($user->is_anonymous() ?
+			"Not <a href='" . make_link("user_admin/login") . "'>logged in</a>" :
+			"Logged in as <a href='" . make_link('user') . "'>{$user->name}</a>");
+
+		return "
+			<div class='comment_form'>
+			".make_form(make_link("comment/add"))."
+				<input type='hidden' name='image_id' value='$i_image_id' />
+				<input type='hidden' name='hash' value='$hash' />
+				<textarea name='comment' rows='5' cols='50'></textarea>
+				$captcha
+				<br><input type='submit' value='Post Comment' />
+				($current_user)
+			</form>
+			</div>
+		";
+	}
 }
 ?>
