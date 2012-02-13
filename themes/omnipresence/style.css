@@ -293,3 +293,6 @@ background:url(checker.png);
 .tag_name.new {
 color: darkred;
 }
+#Wikimain a[href^="http://"], #Wikimain a[href^="https://"] {
+color: cornflowerblue;
+}
