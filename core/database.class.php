@@ -8,6 +8,7 @@ require_once "lib/adodb/adodb-exceptions.inc.php";
 // Querylet {{{
 class Querylet {
 	var $sql;
+	var $order;
 	var $variables;
 
 	public function Querylet($sql, $variables=array()) {
@@ -17,7 +18,11 @@ class Querylet {
 
 	public function append($querylet) {
 		assert(!is_null($querylet));
-		$this->sql .= $querylet->sql;
+		$this->sql .= " " . $querylet->sql;
+		// don't even bother supporting two sort orders at once
+		if (isset($querylet->order)) {
+			$this->order = $querylet->order;
+		}
 		$this->variables = array_merge($this->variables, $querylet->variables);
 	}
 

@@ -112,7 +112,7 @@ class Image {
 		if($limit < 1) $limit = 1;
 
 		$querylet = Image::build_search_querylet($tags);
-		$querylet->append(new Querylet("ORDER BY images.id DESC LIMIT ? OFFSET ?", array($limit, $start)));
+		$querylet->append(new Querylet("ORDER BY {$querylet->order} DESC LIMIT ? OFFSET ?", array($limit, $start)));
 		$result = $database->execute($querylet->sql, $querylet->variables);
 
 		while(!$result->EOF) {
@@ -530,6 +530,7 @@ class Image {
 	private static function build_accurate_search_querylet($terms) {
 		global $config, $database;
 
+		$order = 'images.id';
 		$tag_querylets = array();
 		$img_querylets = array();
 		$positive_tag_count = 0;
@@ -557,6 +558,9 @@ class Image {
 			send_event($stpe);
 			if($stpe->is_querylet_set()) {
 				foreach($stpe->get_querylets() as $querylet) {
+					if (isset($querylet->order)) {
+						$order = $querylet->order;
+					}
 					$img_querylets[] = new ImgQuerylet($querylet, $positive);
 				}
 			}
@@ -684,6 +688,7 @@ class Image {
 			}
 		}
 
+		$query->order = $order;
 		return $query;
 	}
 
@@ -694,6 +699,7 @@ class Image {
 	private static function build_ugly_search_querylet($terms) {
 		global $config, $database;
 
+		$order = 'images.id';
 		$tag_querylets = array();
 		$img_querylets = array();
 		$positive_tag_count = 0;
@@ -722,6 +728,9 @@ class Image {
 			if($stpe->is_querylet_set()) {
 				foreach($stpe->get_querylets() as $querylet) {
 					$img_querylets[] = new ImgQuerylet($querylet, !$negative);
+					if (isset($querylet->order)) {
+						$order = $querylet->order;
+					}
 				}
 			}
 			else {
@@ -815,6 +824,7 @@ class Image {
 			}
 		}
 
+		$query->order = $order;
 		return $query;
 	}
 }

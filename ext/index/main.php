@@ -62,6 +62,15 @@
  *  <p>Search items can be combined to search for images which match both,
  *  or you can stick "-" in front of an item to search for things that don't
  *  match it.
+ *  <p>To reorder the search results, use one of the following search items.
+ *  You can invert the usual order by adding "-" after the "=", like "order=-id".
+ *  <ul>
+ *    <li>order=id (descending ID number; i.e., newest to oldest)
+ *    <li>order=size (descending image dimensions in pixels)
+ *    <li>order=filesize (descending image file size)
+ *    <li>order=ratio (landscape to portrait; i.e., widest to tallest)
+ *    <li>order=score (descending score order)
+ *  </ul>
  *  <p>Some search methods provided by extensions:
  *  <ul>
  *    <li>Danbooru API
@@ -229,6 +238,29 @@ class Index extends SimpleExtension {
 			$cmp = $matches[1];
 			$tags = $matches[2];
 			$event->add_querylet(new Querylet("images.id IN (SELECT DISTINCT image_id FROM image_tags GROUP BY image_id HAVING count(image_id) $cmp $tags)"));
+		}
+		else if(preg_match("/order=(-?)([a-zA-Z]+)/", $event->term, $matches)) {
+			$ql = new Querylet('1 = 1');
+			
+			switch (strtolower($matches[2])) {
+				case 'id':
+					$ql->order = 'images.id';
+					break;
+				case 'size':
+					$ql->order = 'images.width * images.height';
+					break;
+				case 'filesize':
+					$ql->order = 'images.filesize';
+					break;
+				case 'ratio':
+					$ql->order = 'images.width * 1.0 / images.height';
+					break;
+			}
+			
+			if (isset($ql->order)) {
+				$ql->order = "{$matches[1]}{$ql->order}";
+				$event->add_querylet($ql);
+			}
 		}
 	}
 }

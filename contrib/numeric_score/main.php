@@ -156,6 +156,11 @@ class NumericScore implements Extension {
 					"images.id in (SELECT image_id FROM numeric_score_votes WHERE user_id=? AND score=-1)",
 					array($iid)));
 			}
+			if(preg_match("/order=(-?)score/", $event->term, $matches)) {
+				$ql = new Querylet('1 = 1');
+				$ql->order = "{$matches[1]}images.numeric_score";
+				$event->add_querylet($ql);
+			}
 		}
 
 		if($event instanceof UserPageBuildingEvent) {
