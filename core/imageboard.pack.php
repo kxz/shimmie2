@@ -743,17 +743,16 @@ class Image {
 		}
 
 		// merge all the tag querylets into one generic one
-		$sql = "0";
 		$terms = array();
 		foreach($tag_querylets as $tq) {
-			$sign = $tq->positive ? "+" : "-";
-			$sql .= " $sign (tag LIKE ?)";
+			$sign = $tq->positive ? "" : "NOT";
 			$terms[] = $tq->tag;
 			
-			if($sign == "+") $positive_tag_count++;
+			if($tq->positive) $positive_tag_count++;
 			else $negative_tag_count++;
 		}
-		$tag_search = new Querylet($sql, $terms);
+		// needed for the "single positive tag" case
+		$tag_search = new Querylet("", $terms);
 
 		// merge all the image metadata searches into one generic querylet
 		$n = 0;
@@ -770,12 +769,11 @@ class Image {
 
 		// no tags, do a simple search (+image metadata if we have any)
 		if($positive_tag_count + $negative_tag_count == 0) {
-			$query = new Querylet("SELECT images.*,UNIX_TIMESTAMP(posted) AS posted_timestamp FROM images ");
-
-			if(strlen($img_search->sql) > 0) {
-				$query->append_sql(" WHERE ");
-				$query->append($img_search);
-			}
+			// "WHERE 1 = 1" so that we can just append "AND" for $img_search
+			$query = new Querylet("
+				SELECT images.*,UNIX_TIMESTAMP(posted) AS posted_timestamp
+				FROM images WHERE 1 = 1
+			");
 		}
 
 		// one positive tag (a common case), do an optimised search
@@ -793,37 +791,59 @@ class Image {
 						AND image_tags.image_id = images.id
 				",
 				$tag_search->variables);
-
-			if(strlen($img_search->sql) > 0) {
-				$query->append_sql(" AND ");
-				$query->append($img_search);
-            }
 		}
 
 		// more than one positive tag, or more than zero negative tags
 		else {
-			$subquery = new Querylet("
-                SELECT DISTINCT images.*, SUM({$tag_search->sql}) AS score
-				FROM images
-				LEFT JOIN image_tags ON image_tags.image_id = images.id
-				JOIN tags ON image_tags.tag_id = tags.id
-				GROUP BY images.id
-				HAVING score = ?",
-				array_merge(
-					$tag_search->variables,
-					array($positive_tag_count)
-				)
-			);
-			$query = new Querylet("
-				SELECT *, UNIX_TIMESTAMP(posted) AS posted_timestamp
-				FROM ({$subquery->sql}) AS images ", $subquery->variables);
-
-			if(strlen($img_search->sql) > 0) {
-				$query->append_sql(" WHERE ");
-				$query->append($img_search);
+			$positive_id_set = null;
+			$negative_id_set = null;
+			foreach($tag_querylets as $tag_querylet) {
+				$tag_ids = array();
+				$row = $database->Execute("
+					SELECT images.id
+					FROM images
+					LEFT JOIN image_tags ON image_tags.image_id = images.id
+					JOIN tags ON image_tags.tag_id = tags.id
+					WHERE tag LIKE ?
+				", array($tag_querylet->tag));
+				while(!$row->EOF) {
+					$tag_ids[] = $row->fields['id'];
+					$row->MoveNext();
+				}
+				
+				$assign_to = $tag_querylet->positive ? 'positive_id_set' : 'negative_id_set';
+				if(is_null($$assign_to)) {
+					$$assign_to = $tag_ids;
+				} else {
+					$$assign_to = array_intersect($$assign_to, $tag_ids);
+				}
+			}
+			
+			if (count($positive_id_set) > 0 && count($negative_id_set) > 0) {
+				$positive_id_set = array_diff($positive_id_set, $negative_id_set);
+			}
+			
+			if (count($positive_id_set) > 0) {
+				$query = new Querylet("
+					SELECT *, UNIX_TIMESTAMP(posted) AS posted_timestamp
+					FROM images WHERE id IN (" . implode(",", $positive_id_set) . ")
+				");
+			} else if (is_null($positive_id_set) && count($negative_id_set) > 0) {
+				// queries with no positive tags; perform exclusion
+				$query = new Querylet("
+					SELECT *, UNIX_TIMESTAMP(posted) AS posted_timestamp
+					FROM images WHERE id NOT IN (" . implode(",", $negative_id_set) . ")
+				");
+			} else {
+				$query = new Querylet("SELECT NULL FROM images WHERE 0 = 1");
 			}
 		}
 
+		if(strlen($img_search->sql) > 0) {
+			$query->append_sql(" AND ");
+			$query->append($img_search);
+		}
+		
 		$query->order = $order;
 		return $query;
 	}
