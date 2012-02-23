@@ -142,7 +142,8 @@ class Layout {
 			case "post":
 			case "upload":
 				$custom_sublinks .= "<li><a href='".make_link('post/list')."'>All</a></li>";
-				$custom_sublinks .= "<li><a href='".make_link("post/list/favorited_by=$username/1")."'>My Favorites</a></li>";
+				$custom_sublinks .= "<li><a href='".make_link("post/list/upvoted_by=$username/1")."'>Upvoted</a></li>";
+				$custom_sublinks .= "<li><a href='".make_link("post/list/downvoted_by=$username/1")."'>Downvoted</a></li>";
 				$custom_sublinks .= "<li><a href='".make_link("ext_doc/index")."'>Help</a></li>";
 				break;
 			case "comment":
