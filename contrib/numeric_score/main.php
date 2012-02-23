@@ -157,6 +157,18 @@ class NumericScore implements Extension {
 					array($iid)));
 			}
 		}
+
+		if($event instanceof UserPageBuildingEvent) {
+			$i_upvote_count = Image::count_images(array("upvoted_by={$event->display_user->name}"));
+			$i_downvote_count = Image::count_images(array("downvoted_by={$event->display_user->name}"));
+			$i_days_old = ((time() - strtotime($event->display_user->join_date)) / 86400) + 1;
+			$h_upvote_rate = sprintf("%.1f", ($i_upvote_count / $i_days_old));
+			$h_downvote_rate = sprintf("%.1f", ($i_downvote_count / $i_days_old));
+			$upvote_link = make_link("post/list/upvoted_by={$event->display_user->name}/1");
+			$downvote_link = make_link("post/list/downvoted_by={$event->display_user->name}/1");
+			$event->add_stats("<a href='$upvote_link'>Images upvoted</a>: $i_upvote_count, $h_upvote_rate per day");
+			$event->add_stats("<a href='$downvote_link'>Images downvoted</a>: $i_downvote_count, $h_downvote_rate per day");
+		}
 	}
 
 	private function install() {
