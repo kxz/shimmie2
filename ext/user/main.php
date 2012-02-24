@@ -132,7 +132,35 @@ class UserPage extends SimpleExtension {
 // from users
 // join (select owner_id,count(*) as image_count from images group by owner_id) as _images on _images.owner_id=users.id
 // join (select owner_id,count(*) as comment_count from comments group by owner_id) as _comments on _comments.owner_id=users.id;
-				$this->theme->display_user_list($page, User::by_list(0), $user);
+				$sort = "id";
+				$order = "ASC";
+				
+				if (preg_match("/^id|name|min|average|max|count$/i", $event->get_arg(1))) {
+					$sort = strtolower($event->get_arg(1));
+				}
+				
+				if (preg_match("/^asc|desc$/i", $event->get_arg(2))) {
+					$order = strtoupper($event->get_arg(2));
+				}
+				
+				$rows = $database->db->GetAssoc("
+					SELECT users.id AS uid,
+					       users.name AS name,
+					       min, average, max, count
+					FROM users
+					LEFT JOIN (
+						SELECT images.owner_id,
+						       MIN(images.numeric_score) AS min,
+					           AVG(images.numeric_score) AS average,
+					           MAX(images.numeric_score) AS max,
+					           COUNT(images.numeric_score) AS count
+					    FROM images
+					    GROUP BY images.owner_id
+					) AS images
+					ON users.id = images.owner_id
+					ORDER BY $sort $order
+				");
+				$this->theme->display_user_list($page, $rows);
 			}
 		}
 
@@ -214,6 +242,7 @@ class UserPage extends SimpleExtension {
 
 	public function onUserBlockBuilding(Event $event) {
 		$event->add_link("My Profile", make_link("user"));
+		$event->add_link("User List", make_link("user_admin/list"), -1);
 		$event->add_link("Log Out", make_link("user_admin/logout"), 99);
 	}
 

@@ -8,16 +8,34 @@ class UserPageTheme extends Themelet {
 		$page->add_block(new Block("Login There",
 			"There should be a login box to the left"));
 	}
+	
+	public function list_header($column, $label) {
+		return "$label <a href='" . make_link("user_admin/list/$column/asc") .
+		       "'>&uarr;</a><a href='" . make_link("user_admin/list/$column/desc") .
+		       "'>&darr;</a>";
+	}
 
-	public function display_user_list(Page $page, $users, User $user) {
+	public function display_user_list(Page $page, $user_info) {
 		$page->set_title("User List");
 		$page->set_heading("User List");
 		$page->add_block(new NavBlock());
-		$html = "<table>";
-		$html .= "<tr><td>Name</td></tr>";
-		foreach($users as $duser) {
+		$html = "<table class='user_list zebra'>";
+		$html .= "<tr>";
+		$html .= "<th>" . $this->list_header("name", "Name") . "</th>";
+		$html .= "<th>" . $this->list_header("id", "#") . "</th>";
+		$html .= "<th>" . $this->list_header("count", "Images") . "</th>";
+		$html .= "<th class='score'>" . $this->list_header("average", "Avg Score") . "</th>";
+		$html .= "<th class='score'>" . $this->list_header("min", "Worst") . "</th>";
+		$html .= "<th class='score'>" . $this->list_header("max", "Best") . "</th>";
+		$html .= "</tr>";
+		foreach($user_info as $id => $ui) {
 			$html .= "<tr>";
-			$html .= "<td><a href='".make_link("user/".$duser->name)."'>".html_escape($duser->name)."</a></td>";
+			$html .= "<td><a href='".make_link("user/".$ui["name"])."'>".html_escape($ui["name"])."</a></td>";
+			$html .= "<td class='numeric'>".$id."</td>";
+			$html .= "<td class='numeric'><a href='".make_link("post/list/user=".$ui["name"]."/1")."'>".$ui["count"]."</a></td>";
+			$html .= "<td class='numeric'>".$ui["average"]."</td>";
+			$html .= "<td class='numeric'>".$ui["min"]."</td>";
+			$html .= "<td class='numeric'>".$ui["max"]."</td>";
 			$html .= "</tr>";
 		}
 		$html .= "</table>";

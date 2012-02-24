@@ -296,3 +296,14 @@ color: darkred;
 #Wikimain a[href^="http://"], #Wikimain a[href^="https://"] {
 color: cornflowerblue;
 }
+.user_list th {
+vertical-align: bottom;
+white-space: nowrap;
+}
+.user_list .score {
+width: 5em;
+}
+.user_list .numeric {
+padding-left: 8px;
+text-align: right;
+}
