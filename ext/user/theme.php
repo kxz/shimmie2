@@ -31,11 +31,11 @@ class UserPageTheme extends Themelet {
 		foreach($user_info as $id => $ui) {
 			$html .= "<tr>";
 			$html .= "<td><a href='".make_link("user/".$ui["name"])."'>".html_escape($ui["name"])."</a></td>";
-			$html .= "<td class='numeric'>".$id."</td>";
-			$html .= "<td class='numeric'><a href='".make_link("post/list/user=".$ui["name"]."/1")."'>".$ui["count"]."</a></td>";
-			$html .= "<td class='numeric'>".$ui["average"]."</td>";
-			$html .= "<td class='numeric'>".$ui["min"]."</td>";
-			$html .= "<td class='numeric'>".$ui["max"]."</td>";
+			$html .= "<td class='numeric'>$id</td>";
+			$html .= "<td class='numeric'><a href='".make_link("post/list/user_id=$id/1")."'>".$ui["count"]."</a></td>";
+			$html .= "<td class='numeric'>{$ui['average']}</td>";
+			$html .= "<td class='numeric'>{$ui['min']}</td>";
+			$html .= "<td class='numeric'>{$ui['max']}</td>";
 			$html .= "</tr>";
 		}
 		$html .= "</table>";
