@@ -34,33 +34,29 @@ class NumericScore implements Extension {
 
 		if($event instanceof DisplayingImageEvent) {
 			if(!$user->is_anonymous()) {
-				$html = $this->theme->get_voter_html($event->image);
-				if($user->is_admin()) {
-					$html .= "<p><a href='" . make_link("numeric_score_votes/{$event->image->id}") . "'>See All Votes</a>";
+				$votes = $database->get_all(
+					"SELECT users.name as username, user_id, score 
+					FROM numeric_score_votes 
+					JOIN users ON numeric_score_votes.user_id=users.id
+					WHERE image_id=? ORDER BY score DESC, username ASC",
+					array($event->image->id));
+				$upvotes = array();
+				$downvotes = array();
+				
+				foreach($votes as $vote) {
+					if($vote['score'] < 0) {
+						$downvotes[] = $vote['username'];
+					} elseif ($vote['score'] > 0) {
+						$upvotes[] = $vote['username'];
+					}
 				}
+				
+				$html = $this->theme->get_voter_html($event->image, $upvotes, $downvotes);
 				$page->add_block(new Block("Image Score", $html, "left", 20));
 			}
 		}
 
 		if($event instanceof PageRequestEvent) {
-			if($event->page_matches("numeric_score_votes")) {
-				$image_id = int_escape($event->get_arg(0));
-				$x = $database->get_all(
-					"SELECT users.name as username, user_id, score 
-					FROM numeric_score_votes 
-					JOIN users ON numeric_score_votes.user_id=users.id
-					WHERE image_id=?",
-					array($image_id));
-				$html = "<table>";
-				foreach($x as $vote) {
-					$html .= "<tr><td>";
-					$html .= "<a href='/user/{$vote['username']}'>{$vote['username']}</a>";
-					$html .= "</td><td>";
-					$html .= $vote['score'];
-					$html .= "</td></tr>";
-				}
-				die($html);
-			}
 			if($event->page_matches("numeric_score_vote") && $user->check_auth_token()) {
 				if(!$user->is_anonymous()) {
 					$image_id = int_escape($_POST['image_id']);
