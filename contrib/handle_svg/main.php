@@ -58,7 +58,7 @@ class SVGFileHandler implements Extension {
 
 			$page->set_type("image/svg+xml");
 			$page->set_mode("data");
-			$page->set_data(file_get_contents(warehouse_path("images", $hash)));
+			$page->set_data(file_get_contents(warehouse_path("images", "$hash.svg")));
 		}
 	}
 
