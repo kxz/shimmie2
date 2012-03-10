@@ -268,10 +268,9 @@ class TagList implements Extension {
 			FROM tags, image_tags
 			WHERE tags.id = image_tags.tag_id
 			AND image_tags.image_id = ?
-			ORDER BY calc_count DESC
-			LIMIT ?
+			ORDER BY tags.tag ASC
 		";
-		$args = array($image->id, $config->get_int('tag_list_length'));
+		$args = array($image->id);
 
 		$tags = $database->get_all($query, $args);
 		if(count($tags) > 0) {
