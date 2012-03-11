@@ -492,6 +492,7 @@ class Image {
 		$tmpl = str_replace('$filename', $_escape($base_fname), $tmpl);
 		$tmpl = str_replace('$title', $_escape($config->get_string("title")), $tmpl);
 		$tmpl = str_replace('$owner', $_escape($this->get_owner()->name), $tmpl);
+		$tmpl = str_replace('$score', $this->numeric_score, $tmpl);
 
 		$plte = new ParseLinkTemplateEvent($tmpl, $this);
 		send_event($plte);
