@@ -144,6 +144,7 @@ class Layout {
 				$custom_sublinks .= "<li><a href='".make_link('post/list')."'>All</a></li>";
 				$custom_sublinks .= "<li><a href='".make_link("post/list/upvoted_by=$username/1")."'>Upvoted</a></li>";
 				$custom_sublinks .= "<li><a href='".make_link("post/list/downvoted_by=$username/1")."'>Downvoted</a></li>";
+				$custom_sublinks .= "<li><a href='".make_link("random_image/view")."'>Random</a></li>";
 				$custom_sublinks .= "<li><a href='".make_link("ext_doc/index")."'>Help</a></li>";
 				break;
 			case "comment":
