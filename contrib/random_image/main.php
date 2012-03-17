@@ -35,14 +35,14 @@ class RandomImage extends SimpleExtension {
 
 			if($event->get_arg(0) == "download") {
 				if(!is_null($image)) {
-					$page->set_mode("data");
-					$page->set_type("image/jpeg");
-					$page->set_data(file_get_contents($image->get_image_filename()));
+					$page->set_mode("redirect");
+					$page->set_redirect($image->get_image_link());
 				}
 			}
 			if($event->get_arg(0) == "view") {
 				if(!is_null($image)) {
-					send_event(new DisplayingImageEvent($image, $page));
+					$page->set_mode("redirect");
+					$page->set_redirect(make_link("post/view/{$image->id}"));
 				}
 			}
 		}
